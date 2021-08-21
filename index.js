@@ -65,27 +65,22 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndRemove(request.params.id)
     .then(result => {
       response.status(204).end()
     })
+    .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
   
   if (!body.name || !body.number) {
-    return response.status(400).json({ 
-      error: 'data missing' 
-    })
-  }
-
-  if (persons.find(person => person.name === body.name)) {
-    return response.status(400).json({ 
-      error: 'name must be unique' 
-    })
-  }    
+    const error = new Error('Data missing')
+    error.name = 'DataError'
+    return next(error)
+  }  
   
   const person = new Person({
     name: body.name,
@@ -96,6 +91,22 @@ app.post('/api/persons', (request, response) => {
     response.json(result)
   })
 })
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  }
+  
+  if (error.name === 'DataError') {
+    return response.status(400).send({ error: error.message })
+  } 
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
