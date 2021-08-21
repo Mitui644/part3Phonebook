@@ -3,7 +3,14 @@ const morgan = require('morgan')
 
 const app = express()
 
-app.use(morgan('tiny'))
+morgan.token('POST_Content', function (req, res) {
+  if (req.method === 'POST') {
+    return JSON.stringify(req.body)
+  } else {
+    return ""
+  }
+})
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :POST_Content'))
 
 app.use(express.json())
 
