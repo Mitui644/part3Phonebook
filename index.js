@@ -73,30 +73,29 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-    const body = request.body
+  const body = request.body
   
-    if (!body.name || !body.number) {
-      return response.status(400).json({ 
-        error: 'data missing' 
-      })
-    }
+  if (!body.name || !body.number) {
+    return response.status(400).json({ 
+      error: 'data missing' 
+    })
+  }
 
-    if (persons.find(person => person.name === body.name)) {
-        return response.status(400).json({ 
-          error: 'name must be unique' 
-        })
-    }    
+  if (persons.find(person => person.name === body.name)) {
+    return response.status(400).json({ 
+      error: 'name must be unique' 
+    })
+  }    
   
-    const person = {
-        id: Math.ceil(Math.random() * 10000000),
-        name: body.name,
-        number: body.number,
-    }
-  
-    persons = persons.concat(person)
-  
-    response.json(person)
+  const person = new Person({
+    name: body.name,
+    number: body.number,
   })
+
+  person.save().then(result => {
+    response.json(result)
+  })
+})
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
