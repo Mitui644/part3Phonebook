@@ -11,37 +11,37 @@ const url =
   `mongodb+srv://fullstack:${password}@cluster0.gvel4.mongodb.net/persons?retryWrites=true&w=majority`
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
+  name: String,
+  number: String,
 })
-  
+
 const Person = mongoose.model('Person', personSchema)
 
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 
-if(process.argv.length == 5)
+if(process.argv.length === 5)
 {
-    const newName = process.argv[3]
-    const newNumber = process.argv[4]
-      
-    const person = new Person({
-        name: newName,
-        number: newNumber,
-    })
+  const newName = process.argv[3]
+  const newNumber = process.argv[4]
 
-    person.save().then(result => {
-        console.log(`Added ${newName} number ${newNumber} to phonebook`)
-        mongoose.connection.close()
-    })
+  const person = new Person({
+    name: newName,
+    number: newNumber,
+  })
 
-} else if (process.argv.length == 3) {
+  person.save().then(() => {
+    console.log(`Added ${newName} number ${newNumber} to phonebook`)
+    mongoose.connection.close()
+  })
 
-    Person.find({}).then(result => {
-        console.log('phonebook:')
-        result.forEach(person => {
-          console.log(`${person.name} ${person.number}`)
-        })
-        mongoose.connection.close()
+} else if (process.argv.length === 3) {
+
+  Person.find({}).then(result => {
+    console.log('phonebook:')
+    result.forEach(person => {
+      console.log(`${person.name} ${person.number}`)
     })
+    mongoose.connection.close()
+  })
 
 }
